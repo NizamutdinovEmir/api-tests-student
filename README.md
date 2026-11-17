@@ -9,41 +9,40 @@
 
 ## Запуск тестов
 
-1. Установите любое IDE для разработки: [Jetbrains GoLand](https://www.jetbrains.com/ru-ru/go/) (Платное или по студенческой лицензии), [VS Code](https://code.visualstudio.com/) (бесплатное).
-2. Установите [Git](https://git-scm.com/install/) на компьютер
-3. [Установите](https://go.dev/doc/install) Go версии 1.25.1
-4. [Настройте](https://docs.github.com/ru/authentication/connecting-to-github-with-ssh) доступ к своему Github-аккаунту
-   по SSH-ключу.
-5. Склонируйте себе репозиторий: `git clone <путь к вашему репозиторию>`
-6. Подтяните необходимые зависимости через команду в корне проекта:
+1. Установите [Git](https://git-scm.com/install/) и [Go 1.25.1 или новее](https://go.dev/doc/install).
+2. Склонируйте fork через HTTPS и в корне проекта скачайте зависимости.
 
 ```bash
-   go mod tidy
+go mod download
 ```
 
-7. В файле `.env.override` (создайте его в корне, если нет) выставьте правильные значения для переменных окружения:
+3. Подготовьте два разных аккаунта на [TestBoard](https://testboard.avito.com/). Продавец создаёт объявления, покупатель добавляет их в избранное. Создайте в корне проекта локальный файл `.env.override` с данными этих аккаунтов.
 
 ```
-TEST_LOGIN=your_login
-TEST_PASSWORD=your_password
+TEST_LOGIN=seller@example.com
+TEST_PASSWORD=seller_password
+TEST_BUYER_LOGIN=buyer@example.com
+TEST_BUYER_PASSWORD=buyer_password
 ```
 
-8. Для запуска всех тестов достаточно выполнить команду в корне проекта:
+4. Для полного прогона создайте у продавца объявление «Пять ноль» с описанием и фотографией. Его используют сценарии первой практики. Вторая работа создаёт собственные тестовые объявления и удаляет их после проверок.
 
 ```bash
-  go test -v ./...
+go test -v -p 1 -count=1 ./...
 ```
 
-9. Отдельный пакет с тестами можно запустить командой:
+Чтобы запустить только вторую работу, выполните из корня проекта:
 
 ```bash
-  go test -v ./tests/scenarios/myAdvertisement/
+go test -v -p 1 -count=1 ./tests/scenarios/advertisementCreation ./tests/scenarios/favorites
 ```
+
+Флаг `-p 1` запускает пакеты последовательно, чтобы не перегружать шлюз TestBoard.
 
 ## Логирование
 
-Для включения логирования request/response в консоль: выставьте переменную окружения `DEBUG=true` в
-`.env.override`
+Флаг `-v` выводит шаги тестов и результаты проверок. Для локальной диагностики HTTP-запросов можно установить
+`DEBUG=true` в `.env.override`. Такой вывод содержит данные авторизации.
 
 ## Запуск линтера
 
@@ -51,5 +50,5 @@ TEST_PASSWORD=your_password
 2. Запуск линтера (из корня репозитория):
 
 ```bash
-  golangci-lint run
+golangci-lint run
 ```
